@@ -1,1 +1,1 @@
-# SG-Clinic
+# Virtuaaliklinikka
