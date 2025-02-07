@@ -39,7 +39,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
 
         context.res = {
             status: 201,
-            body: `Appointment created successfully. ID: ${result.insertedId}`
+            body: `Appointment created successfully! ID: ${result.insertedId}`
         };
     } catch (error) {
         context.log.error('Error creating appointment:', error);
