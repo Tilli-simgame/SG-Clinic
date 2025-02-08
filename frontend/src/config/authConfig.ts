@@ -3,7 +3,7 @@ export const msalConfig = {
     clientId: process.env.REACT_APP_CLIENT_ID!,
     authority: `https://simgameplatform.b2clogin.com/${process.env.REACT_APP_TENANT_NAME}.onmicrosoft.com/${process.env.REACT_APP_POLICY_NAME}`,
     knownAuthorities: ["simgameplatform.b2clogin.com"],
-    redirectUri: "http://localhost:3000"
+    redirectUri: process.env.REACT_APP_REDIRECT_URI || "http://localhost:3000"
   },
   cache: {
     cacheLocation: "sessionStorage",
