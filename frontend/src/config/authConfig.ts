@@ -12,5 +12,5 @@ export const msalConfig = {
 };
 
 export const loginRequest = {
-  scopes: ["openid", "profile", "email"]
+  scopes: ["openid", "profile", "email", `https://${process.env.REACT_APP_TENANT_NAME}.onmicrosoft.com/api/appointments.write`]
 };
