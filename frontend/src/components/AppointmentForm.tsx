@@ -1,6 +1,8 @@
+'use client';
+
 import React, { useState } from 'react';
 import { useMsal } from '@azure/msal-react';
-import { InteractionStatus } from '@azure/msal-browser';
+import { InteractionStatus, AccountInfo } from '@azure/msal-browser';
 
 interface AppointmentFormProps {
   selectedDate: Date | null;
@@ -9,7 +11,7 @@ interface AppointmentFormProps {
 }
 
 function AppointmentForm({ selectedDate, selectedTime, isAuthenticated }: AppointmentFormProps) {
-  const { instance, inProgress } = useMsal();
+  const { instance, inProgress, accounts } = useMsal();
   const [formData, setFormData] = useState({
     petName: '',
     petType: '',
@@ -44,19 +46,29 @@ function AppointmentForm({ selectedDate, selectedTime, isAuthenticated }: Appoin
     };
 
     try {
+      console.log('Authentication status:', isAuthenticated);
+      console.log('Interaction status:', inProgress);
+      console.log('Accounts:', accounts);
+
       if (inProgress !== InteractionStatus.None) {
         throw new Error('Authentication interaction is in progress');
       }
 
-      const account = instance.getAllAccounts()[0];
-      if (!account) {
+      if (accounts.length === 0) {
         throw new Error('No active account found');
       }
 
-      const tokenResponse = await instance.acquireTokenSilent({
+      const account = accounts[0];
+      console.log('Selected account:', account);
+
+      const tokenRequest = {
         scopes: [`https://${process.env.REACT_APP_TENANT_NAME}.onmicrosoft.com/api/appointments.write`],
         account: account
-      });
+      };
+      console.log('Token request:', tokenRequest);
+
+      const tokenResponse = await instance.acquireTokenSilent(tokenRequest);
+      console.log('Token acquired successfully');
 
       const response = await fetch(`${process.env.REACT_APP_FUNCTION_APP_URL}/api/ProcessAppointment`, {
         method: 'POST',
@@ -67,9 +79,12 @@ function AppointmentForm({ selectedDate, selectedTime, isAuthenticated }: Appoin
         body: JSON.stringify(appointmentData),
       });
 
+      console.log('Response status:', response.status);
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+
       if (response.ok) {
-        const result = await response.text();
-        setSuccess(result);
+        setSuccess(responseText);
         setFormData({
           petName: '',
           petType: '',
@@ -78,8 +93,7 @@ function AppointmentForm({ selectedDate, selectedTime, isAuthenticated }: Appoin
           reason: ''
         });
       } else {
-        const errorText = await response.text();
-        throw new Error(errorText || 'Failed to book appointment');
+        throw new Error(responseText || 'Failed to book appointment');
       }
     } catch (error) {
       console.error('Error:', error);
