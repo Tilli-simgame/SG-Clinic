@@ -71,6 +71,10 @@ function AppointmentForm({ selectedDate, selectedTime, isAuthenticated }: Appoin
       console.log('Token acquired successfully');
       console.log('Token:', tokenResponse.accessToken);
 
+      // Add this new logging
+      const decodedToken = JSON.parse(atob(tokenResponse.accessToken.split('.')[1]));
+      console.log('Decoded token:', decodedToken);
+
       const response = await fetch(`${process.env.REACT_APP_FUNCTION_APP_URL}/api/ProcessAppointment`, {
         method: 'POST',
         headers: {

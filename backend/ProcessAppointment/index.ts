@@ -40,13 +40,17 @@ async function validateToken(token: string): Promise<{ isValid: boolean, scopes:
     try {
         const decodedToken: any = jwt.decode(token, { complete: true });
         if (!decodedToken) {
+            console.log('Token could not be decoded');
             throw new Error("Invalid token");
         }
 
         console.log('Decoded token:', JSON.stringify(decodedToken, null, 2));
 
         const kid = decodedToken.header.kid;
+        console.log('Token kid:', kid);
+        
         const signingKey = await getSigningKey(kid);
+        console.log('Signing key retrieved successfully');
 
         return new Promise((resolve, reject) => {
             jwt.verify(token, signingKey, {
@@ -58,6 +62,7 @@ async function validateToken(token: string): Promise<{ isValid: boolean, scopes:
                     console.error('Token validation error:', err);
                     resolve({ isValid: false, scopes: [] });
                 } else {
+                    console.log('Token verified successfully');
                     console.log('Decoded token:', JSON.stringify(decoded, null, 2));
                     const scopes = decoded.scp ? decoded.scp.split(' ') : [];
                     resolve({ isValid: true, scopes });
@@ -101,6 +106,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
 
         const validationResult = await validateToken(token);
         if (!validationResult.isValid) {
+            context.log('Token validation failed');
             context.res = {
                 status: 401,
                 body: "Invalid token"
@@ -109,6 +115,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         }
 
         if (!validationResult.scopes.includes('appointments.write')) {
+            context.log('Token does not have required scope');
             context.res = {
                 status: 403,
                 body: "Token does not have the required scope"
@@ -121,6 +128,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
 
         // Validate appointment data
         if (!appointment || !appointment.petName || !appointment.petType || !appointment.appointmentDate || !appointment.appointmentTime) {
+            context.log('Invalid appointment data');
             context.res = {
                 status: 400,
                 body: "Invalid appointment data. Please provide all required fields."
@@ -139,6 +147,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
         await client.close();
 
         if (result.acknowledged) {
+            context.log('Appointment booked successfully');
             context.res = {
                 status: 200,
                 body: "Appointment booked successfully"
