@@ -28,6 +28,7 @@ jobs:
           REACT_APP_POLICY_NAME: ${{ secrets.REACT_APP_POLICY_NAME }}
           AZURE_STATIC_WEB_APP_URL: ${{ secrets.AZURE_STATIC_WEB_APP_URL }}
           REACT_APP_REDIRECT_URI: ${{ secrets.REACT_APP_REDIRECT_URI }}
+          REACT_APP_FUNCTION_APP_URL: ${{ secrets.REACT_APP_FUNCTION_APP_URL }}
         with:
           azure_static_web_apps_api_token: ${{ secrets.AZURE_STATIC_WEB_APPS_API_TOKEN_WHITE_SKY_069BCC703 }}
           repo_token: ${{ secrets.GITHUB_TOKEN }} # Used for Github integrations (i.e. PR comments)
