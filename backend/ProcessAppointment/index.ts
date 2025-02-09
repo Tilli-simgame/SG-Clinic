@@ -104,7 +104,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
             return;
         }
 
-        if (!validationResult.scopes.includes(`https://${process.env.TENANT_NAME}.onmicrosoft.com/api/appointments.write`)) {
+        if (!validationResult.scopes.includes('appointments.write')) {
             context.res = {
                 status: 403,
                 body: "Token does not have the required scope"
