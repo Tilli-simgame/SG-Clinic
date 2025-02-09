@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import { useMsal } from '@azure/msal-react';
-import { InteractionStatus, AccountInfo } from '@azure/msal-browser';
+import { InteractionStatus } from '@azure/msal-browser';
 
 interface AppointmentFormProps {
   selectedDate: Date | null;
