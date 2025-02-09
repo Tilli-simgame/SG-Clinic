@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-    paths:
-      - './frontend/**'
-      - '.github/workflows/**'
   pull_request:
     types: [opened, synchronize, reopened, closed]
     branches:
