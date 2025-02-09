@@ -83,6 +83,7 @@ function AppointmentForm({ selectedDate, selectedTime, isAuthenticated }: Appoin
       console.log('Response status:', response.status);
       const responseText = await response.text();
       console.log('Response text:', responseText);
+      console.log('Full response object:', response);
 
       if (response.ok) {
         setSuccess(responseText);
