@@ -1,7 +1,7 @@
 import { AzureFunction, Context, HttpRequest } from "@azure/functions"
 import { MongoClient } from "mongodb";
 import * as jwt from 'jsonwebtoken';
-import { JwksClient, SigningKey } from 'jwks-rsa';
+import { JwksClient } from 'jwks-rsa';
 
 interface Appointment {
   petName: string;
@@ -25,7 +25,7 @@ async function getSigningKey(kid: string): Promise<string> {
             } else if (!key) {
                 reject(new Error("No signing key found"));
             } else {
-                const signingKey = (key as SigningKey).getPublicKey();
+                const signingKey = key.getPublicKey();
                 if (!signingKey) {
                     reject(new Error("Unable to get public key"));
                 } else {
@@ -43,6 +43,8 @@ async function validateToken(token: string): Promise<{ isValid: boolean, scopes:
             throw new Error("Invalid token");
         }
 
+        console.log('Decoded token:', JSON.stringify(decodedToken, null, 2));
+
         const kid = decodedToken.header.kid;
         const signingKey = await getSigningKey(kid);
 
@@ -56,6 +58,7 @@ async function validateToken(token: string): Promise<{ isValid: boolean, scopes:
                     console.error('Token validation error:', err);
                     resolve({ isValid: false, scopes: [] });
                 } else {
+                    console.log('Decoded token:', JSON.stringify(decoded, null, 2));
                     const scopes = decoded.scp ? decoded.scp.split(' ') : [];
                     resolve({ isValid: true, scopes });
                 }
@@ -89,6 +92,8 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
             };
             return;
         }
+
+        console.log('Received token:', token);
 
         const validationResult = await validateToken(token);
         if (!validationResult.isValid) {

@@ -69,6 +69,7 @@ function AppointmentForm({ selectedDate, selectedTime, isAuthenticated }: Appoin
 
       const tokenResponse = await instance.acquireTokenSilent(tokenRequest);
       console.log('Token acquired successfully');
+      console.log('Token:', tokenResponse.accessToken);
 
       const response = await fetch(`${process.env.REACT_APP_FUNCTION_APP_URL}/api/ProcessAppointment`, {
         method: 'POST',
