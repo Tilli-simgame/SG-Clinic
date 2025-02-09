@@ -72,11 +72,14 @@ async function validateToken(token: string): Promise<{ isValid: boolean, scopes:
 
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
     context.log('HTTP trigger function processed a request.');
+    context.log('Request headers:', req.headers);
+    context.log('Request body:', req.body);
 
     try {
         // Validate the token
         const authHeader = req.headers['authorization'];
         if (!authHeader) {
+            context.log('No authorization header provided');
             context.res = {
                 status: 401,
                 body: "No authorization header provided"
@@ -86,6 +89,7 @@ const httpTrigger: AzureFunction = async function (context: Context, req: HttpRe
 
         const token = authHeader.split(' ')[1];
         if (!token) {
+            context.log('No token provided');
             context.res = {
                 status: 401,
                 body: "No token provided"
