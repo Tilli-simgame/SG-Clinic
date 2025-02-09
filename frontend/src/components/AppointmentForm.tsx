@@ -81,9 +81,9 @@ function AppointmentForm({ selectedDate, selectedTime, isAuthenticated }: Appoin
       });
 
       console.log('Response status:', response.status);
+      console.log('Response headers:', Object.fromEntries(response.headers));
       const responseText = await response.text();
       console.log('Response text:', responseText);
-      console.log('Full response object:', response);
 
       if (response.ok) {
         setSuccess(responseText);
@@ -95,7 +95,7 @@ function AppointmentForm({ selectedDate, selectedTime, isAuthenticated }: Appoin
           reason: ''
         });
       } else {
-        throw new Error(responseText || 'Failed to book appointment');
+        throw new Error(responseText || `Failed to book appointment: ${response.status} ${response.statusText}`);
       }
     } catch (error) {
       console.error('Error:', error);
