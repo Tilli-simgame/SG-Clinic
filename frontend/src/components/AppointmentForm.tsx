@@ -10,7 +10,7 @@ interface AppointmentFormProps {
   isAuthenticated: boolean;
 }
 
-function AppointmentForm({ selectedDate, selectedTime, isAuthenticated }: AppointmentFormProps) {
+export default function AppointmentForm({ selectedDate, selectedTime, isAuthenticated }: AppointmentFormProps) {
   const { instance, inProgress, accounts } = useMsal();
   const [formData, setFormData] = useState({
     petName: '',
@@ -62,7 +62,7 @@ function AppointmentForm({ selectedDate, selectedTime, isAuthenticated }: Appoin
       console.log('Selected account:', account);
 
       const tokenRequest = {
-        scopes: [`https://${process.env.REACT_APP_TENANT_NAME}.onmicrosoft.com/api/appointments.write`],
+        scopes: [`https://${process.env.NEXT_PUBLIC_TENANT_NAME}.onmicrosoft.com/api/appointments.write`],
         account: account
       };
       console.log('Token request:', tokenRequest);
@@ -71,11 +71,7 @@ function AppointmentForm({ selectedDate, selectedTime, isAuthenticated }: Appoin
       console.log('Token acquired successfully');
       console.log('Token:', tokenResponse.accessToken);
 
-      // Add this new logging
-      const decodedToken = JSON.parse(atob(tokenResponse.accessToken.split('.')[1]));
-      console.log('Decoded token:', decodedToken);
-
-      const response = await fetch(`${process.env.REACT_APP_FUNCTION_APP_URL}/api/ProcessAppointment`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_FUNCTION_APP_URL}/api/ProcessAppointment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -85,7 +81,6 @@ function AppointmentForm({ selectedDate, selectedTime, isAuthenticated }: Appoin
       });
 
       console.log('Response status:', response.status);
-      console.log('Response headers:', Object.fromEntries(response.headers));
       const responseText = await response.text();
       console.log('Response text:', responseText);
 
@@ -99,7 +94,7 @@ function AppointmentForm({ selectedDate, selectedTime, isAuthenticated }: Appoin
           reason: ''
         });
       } else {
-        throw new Error(responseText || `Failed to book appointment: ${response.status} ${response.statusText}`);
+        throw new Error(responseText || 'Failed to book appointment');
       }
     } catch (error) {
       console.error('Error:', error);
@@ -110,105 +105,118 @@ function AppointmentForm({ selectedDate, selectedTime, isAuthenticated }: Appoin
   };
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      {error && <div className="p-4 bg-red-50 border border-red-200 rounded-md text-red-600">{error}</div>}
-      {success && <div className="p-4 bg-green-50 border border-green-200 rounded-md text-green-600">{success}</div>}
-      
+    <form onSubmit={handleSubmit} className="space-y-6 max-w-md mx-auto">
+      {error && (
+        <div className="p-4 bg-red-50 border border-red-200 rounded-md text-red-600">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="p-4 bg-green-50 border border-green-200 rounded-md text-green-600">
+          {success}
+        </div>
+      )}
+
       <div className="space-y-2">
-        <label htmlFor="petName" className="text-sm font-medium text-gray-700">Pet's Name</label>
+        <label htmlFor="petName" className="block text-sm font-medium text-gray-700">
+          Pet's Name
+        </label>
         <input
           id="petName"
           name="petName"
           type="text"
+          required
           value={formData.petName}
           onChange={handleInputChange}
-          placeholder="e.g., Fluffy"
-          required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
-      
+
       <div className="space-y-2">
-        <label htmlFor="petType" className="text-sm font-medium text-gray-700">Pet Type</label>
+        <label htmlFor="petType" className="block text-sm font-medium text-gray-700">
+          Pet Type
+        </label>
         <select
           id="petType"
           name="petType"
+          required
           value={formData.petType}
           onChange={handleInputChange}
-          required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
         >
           <option value="">Select pet type</option>
           <option value="dog">Dog</option>
           <option value="cat">Cat</option>
-          <option value="horse">Horse</option>
+          <option value="bird">Bird</option>
           <option value="other">Other</option>
         </select>
       </div>
-      
+
       <div className="space-y-2">
-        <label htmlFor="breed" className="text-sm font-medium text-gray-700">Breed</label>
+        <label htmlFor="breed" className="block text-sm font-medium text-gray-700">
+          Breed
+        </label>
         <input
           id="breed"
           name="breed"
           type="text"
+          required
           value={formData.breed}
           onChange={handleInputChange}
-          placeholder="e.g., Golden Retriever"
-          required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
-      
+
       <div className="space-y-2">
-        <label htmlFor="age" className="text-sm font-medium text-gray-700">Age</label>
+        <label htmlFor="age" className="block text-sm font-medium text-gray-700">
+          Age
+        </label>
         <input
           id="age"
           name="age"
-          type="number"
+          type="text"
+          required
           value={formData.age}
           onChange={handleInputChange}
-          placeholder="Age in years"
-          required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
         />
       </div>
-      
+
       <div className="space-y-2">
-        <label htmlFor="reason" className="text-sm font-medium text-gray-700">Reason for Appointment</label>
+        <label htmlFor="reason" className="block text-sm font-medium text-gray-700">
+          Reason for Appointment
+        </label>
         <textarea
           id="reason"
           name="reason"
+          required
           value={formData.reason}
           onChange={handleInputChange}
-          placeholder="Please describe the reason for your visit"
-          required
-          className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 min-h-[100px]"
+          rows={3}
+          className="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
         ></textarea>
       </div>
-      
+
       {selectedDate && selectedTime && (
         <div className="p-4 bg-blue-50 border border-blue-200 rounded-md">
           <h3 className="text-lg font-semibold text-blue-800 mb-2">Selected Appointment</h3>
-          <p className="text-blue-600">{selectedDate.toDateString()}, {selectedTime}</p>
+          <p className="text-blue-600">
+            {selectedDate.toDateString()}, {selectedTime}
+          </p>
         </div>
       )}
-      
-      <div className="pt-6">
-        <button
-          type="submit"
-          disabled={!isAuthenticated || isSubmitting}
-          className={`w-full px-4 py-2 text-white rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
-            isAuthenticated && !isSubmitting
-              ? 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
-              : 'bg-gray-400 cursor-not-allowed'
-          }`}
-        >
-          {isSubmitting ? 'Booking...' : 'Book Appointment'}
-        </button>
-      </div>
+
+      <button
+        type="submit"
+        disabled={!isAuthenticated || isSubmitting}
+        className={`w-full px-4 py-2 text-white font-semibold rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 ${
+          isAuthenticated && !isSubmitting
+            ? 'bg-blue-600 hover:bg-blue-700 focus:ring-blue-500'
+            : 'bg-gray-400 cursor-not-allowed'
+        }`}
+      >
+        {isSubmitting ? 'Booking...' : 'Book Appointment'}
+      </button>
     </form>
   );
 }
-
-export default AppointmentForm;
