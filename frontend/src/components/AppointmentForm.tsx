@@ -62,7 +62,7 @@ export default function AppointmentForm({ selectedDate, selectedTime, isAuthenti
       console.log('Selected account:', account);
 
       const tokenRequest = {
-        scopes: [`https://${process.env.NEXT_PUBLIC_TENANT_NAME}.onmicrosoft.com/api/appointments.write`],
+        scopes: [`https://${process.env.REACT_APP_TENANT_NAME}.onmicrosoft.com/api/appointments.write`],
         account: account
       };
       console.log('Token request:', tokenRequest);
@@ -71,7 +71,7 @@ export default function AppointmentForm({ selectedDate, selectedTime, isAuthenti
       console.log('Token acquired successfully');
       console.log('Token:', tokenResponse.accessToken);
 
-      const response = await fetch(`${process.env.NEXT_PUBLIC_FUNCTION_APP_URL}/api/ProcessAppointment`, {
+      const response = await fetch(`${process.env.REACT_APP_FUNCTION_APP_URL}/api/ProcessAppointment`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
