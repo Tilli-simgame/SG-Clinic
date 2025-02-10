@@ -21,12 +21,15 @@ async function getSigningKey(kid: string): Promise<string> {
     return new Promise((resolve, reject) => {
         jwksClient.getSigningKey(kid, (err, key) => {
             if (err) {
+                console.error('Error getting signing key:', err);
                 reject(err);
             } else if (!key) {
+                console.error('No signing key found');
                 reject(new Error("No signing key found"));
             } else {
                 const signingKey = key.getPublicKey();
                 if (!signingKey) {
+                    console.error('Unable to get public key');
                     reject(new Error("Unable to get public key"));
                 } else {
                     resolve(signingKey);
@@ -40,7 +43,7 @@ async function validateToken(token: string): Promise<{ isValid: boolean, scopes:
     try {
         const decodedToken: any = jwt.decode(token, { complete: true });
         if (!decodedToken) {
-            console.log('Token could not be decoded');
+            console.error('Token could not be decoded');
             throw new Error("Invalid token");
         }
 
@@ -76,7 +79,7 @@ async function validateToken(token: string): Promise<{ isValid: boolean, scopes:
 
 const httpTrigger: AzureFunction = async function (context: Context, req: HttpRequest): Promise<void> {
     context.log('HTTP trigger function processed a request.');
-    console.log('Request:', JSON.stringify(req, null, 2));
+    console.log('Request headers:', JSON.stringify(req.headers, null, 2));
 
     try {
         // Validate the token
